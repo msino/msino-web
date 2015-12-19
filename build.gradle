@@ -1,0 +1,73 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url "http://repo.spring.io/snapshot" }
+        maven { url "http://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+apply plugin: 'idea'
+apply plugin: 'war'
+
+sourceCompatibility = 1.7 // 设置 JDK 版本
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+//    providedRuntime
+    mainClassName  = 'com.msino.web.MainApplication'
+}
+
+
+dependencies {
+    apache = ["org.apache.velocity:velocity:1.7",
+              "org.apache.velocity:velocity-tools:2.0",
+              "commons-logging:commons-logging:1.1.1",
+              "commons-io:commons-io:2.0.1",
+              "commons-codec:commons-codec:1.5",
+              "commons-fileupload:commons-fileupload:1.2.2",
+              "org.apache.commons:commons-lang3:3.1"]
+
+    gson = ["com.google.code.gson:gson:1.7.1"]
+
+    spring = ["org.springframework.boot:spring-boot-starter-web:1.2.7.RELEASE",
+              "org.springframework.boot:spring-boot-starter-velocity:1.2.7.RELEASE",
+              "org.bouncycastle:bcprov-jdk16:1.46",
+              "org.bouncycastle:bcprov-ext-jdk16:1.46"]
+
+    log4j = ["log4j:log4j:1.2.16"]
+
+    xsstream = ["com.thoughtworks.xstream:xstream:1.4.3"]
+
+    myjar = fileTree(dir: 'lib/', include: '*.jar')
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile apache, gson, spring, log4j, xsstream, myjar
+
+//    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat:1.2.7.RELEASE")
+}
+
+war {
+    baseName = 'msino-web'
+    version =  '0.1.0'
+}
+
+//依赖编译，然后打包JAR
+task taskJar(type:Jar, dependsOn: compileJava) {
+    from 'out/production/msino-web'
+    baseName = 'msino-web'
+    exclude "css/", "images/", "js/", "WEB-INF/velocity/", "WEB-INF", "templates"
+    exclude '**/*.properties', '**/dataSource.xml', '**/*.jks'
+    destinationDir = file('build/libs')
+}
+
+
+
